@@ -1,0 +1,16 @@
+{
+  "name": "comp7082_group19_brainbot",
+  "version": "1.0.0",
+  "description": "A Discord bot for creating, studying, and sharing flashcards in any discord server.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "discord.js": "^14.27.0",
+    "dotenv": "^18.0.8"
+  }
+}
