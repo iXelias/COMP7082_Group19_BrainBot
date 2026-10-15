@@ -26,7 +26,7 @@ for (const file of commandFiles)
     }
 }
 
-client.once('ready', async () =>
+client.once('clientReady', async () =>
 {
     console.log(`Bot is online as ${ client.user.tag }`);
 
@@ -40,33 +40,52 @@ client.once('ready', async () =>
     catch (error) { console.error(error); }
 });
 
-client.on('interactionCreate', async interaction =>
+client.on('messageCreate', (message) =>
 {
-    if (!interaction.isChatInputCommand()) return;
-
-    const command = client.commands.get(interaction.commandName);
-    if (!command) 
+    if (message.author.bot) 
         return;
 
-    try
+    if (message.content.toLowerCase() === '!ping')    
+        message.reply('Pong!');
+    
+});
+
+client.on('interactionCreate', async interaction =>
+{
+    // Debug log 1: See if Discord is reaching your bot
+    console.log(`Received interaction: ${ interaction.type } | Command: ${ interaction.commandName }`);
+
+    if (interaction.isChatInputCommand())
     {
-        await command.execute(interaction, flashcardsDatabase);
-    } 
-    catch (error)
+        const command = client.commands.get(interaction.commandName);
+        if (!command)        
+            return console.log(`Command NOT found in collection: ${ interaction.commandName }`);        
+
+        try
+        {
+            console.log(`Executing command: ${ interaction.commandName }`);
+            await command.execute(interaction, flashcardsDatabase);
+        }
+        catch (error)
+        {
+            console.error('Execution Error:', error);
+            await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+        }
+        return;
+    }
+
+    if (interaction.isButton())
     {
-        console.error(error);
-        await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+        console.log(`Button clicked! Custom ID: ${ interaction.customId }`);
+        if (interaction.customId.startsWith('reveal_'))
+        {
+            const answer = interaction.customId.replace('reveal_', '');
+            await interaction.reply({ content: `**The answer is:**\n${ answer }`, ephemeral: true });
+        }
+        return;
     }
 });
 
-// Handle the button reveal globally
-client.on('interactionCreate', async interaction =>
-{
-    if (!interaction.isButton()) 
-        return;
 
-    if (interaction.customId.startsWith('reveal_'))    
-        await interaction.reply({ content: `**The answer is:**\n${ interaction.customId.replace('reveal_', '') }`, ephemeral: true });    
-});
 
 client.login(process.env.DISCORD_TOKEN);
