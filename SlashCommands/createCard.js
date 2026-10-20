@@ -21,7 +21,7 @@ module.exports =
         const userId = interaction.user.id;
 
         if (!flashcardsDatabase.has(userId))        
-            flashcardsDatabase.set(userId, []);        
+            flashcardsDatabase.set(userId, []);
 
         flashcardsDatabase.get(userId).push({ question, answer });
 

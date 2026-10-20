@@ -57,7 +57,6 @@ client.on('messageCreate', (message) =>
 
     if (message.content.toLowerCase() === '!ping')
         message.reply('Pong!');
-
 });
 
 client.on('interactionCreate', async interaction =>
@@ -86,11 +85,9 @@ client.on('interactionCreate', async interaction =>
     if (interaction.isButton())
     {
         console.log(`Button clicked! Custom ID: ${ interaction.customId }`);
-        if (interaction.customId.startsWith('reveal_'))
-        {
-            const answer = interaction.customId.replace('reveal_', '');
-            await interaction.reply({ content: `**The answer is:**\n${ answer }`, ephemeral: true });
-        }
+        if (interaction.customId.startsWith('reveal_'))        
+            await interaction.reply({ content: `**The answer is:**\n${ interaction.customId.replace('reveal_', '') }`, ephemeral: true });
+        
         return;
     }
 });
