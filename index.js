@@ -1,7 +1,7 @@
 require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
-const { Client, GatewayIntentBits, Collection, REST, Routes } = require('discord.js');
+const { Client, GatewayIntentBits, Collection, REST, Routes, ActivityType } = require('discord.js');
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
 
@@ -30,36 +30,45 @@ client.once('clientReady', async () =>
 {
     console.log(`Bot is online as ${ client.user.tag }`);
 
+    client.user.setPresence(
+        {
+            activities: [
+                {
+                    name: 'you studying',
+                    type: ActivityType.Watching
+                }],
+            status: 'online',
+        });
+
     const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN);
     try
     {
-        console.log(`Started refreshing ${ commandsDataForRegistration.length } application (/) commands.`);
+        console.log(`Started refreshing ${ commandsDataForRegistration.length } application commands.`);
         await rest.put(Routes.applicationCommands(client.user.id), { body: commandsDataForRegistration });
-        console.log('Successfully reloaded application (/) commands.');
-    } 
+        console.log('Successfully reloaded application commands.');
+    }
     catch (error) { console.error(error); }
 });
 
 client.on('messageCreate', (message) =>
 {
-    if (message.author.bot) 
+    if (message.author.bot)
         return;
 
-    if (message.content.toLowerCase() === '!ping')    
+    if (message.content.toLowerCase() === '!ping')
         message.reply('Pong!');
-    
+
 });
 
 client.on('interactionCreate', async interaction =>
 {
-    // Debug log 1: See if Discord is reaching your bot
     console.log(`Received interaction: ${ interaction.type } | Command: ${ interaction.commandName }`);
 
     if (interaction.isChatInputCommand())
     {
         const command = client.commands.get(interaction.commandName);
-        if (!command)        
-            return console.log(`Command NOT found in collection: ${ interaction.commandName }`);        
+        if (!command)
+            return console.log(`Command NOT found in collection: ${ interaction.commandName }`);
 
         try
         {
