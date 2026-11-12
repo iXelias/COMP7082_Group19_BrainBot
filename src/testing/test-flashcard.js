@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
-const connectDatabase = require('./database');
-const Deck = require('./models/deck');
-const Flashcard = require('./models/flashcard');
+const connectDatabase = require('../database');
+const Deck = require('../models/deck');
+const Flashcard = require('../models/flashcard');
 
 async function run() {
   await connectDatabase();

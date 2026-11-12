@@ -23,7 +23,12 @@ const deckSchema = new mongoose.Schema(
             required: [true, 'A deck needs an owner.'],
         },
     },
-    {timestamps: true}
+    { timestamps: true }
 );
+
+deckSchema.index(
+    { ownerId: 1, title: 1},
+    { unique: true, collation: { locale: 'en', strength: 2 } }
+)
 
 module.exports = mongoose.model('Deck', deckSchema);

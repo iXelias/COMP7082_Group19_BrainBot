@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
-const connectDatabase = require('./database');
-const Deck = require('./models/deck');
+const connectDatabase = require('../database');
+const Deck = require('../models/deck');
 
 async function run() {
   await connectDatabase();
