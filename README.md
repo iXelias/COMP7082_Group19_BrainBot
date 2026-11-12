@@ -12,7 +12,7 @@ Before setting up the project, make sure you have the following installed:
 ### 1. Clone the Repository
 Open your terminal and clone the project to your local machine:
 ```bash
-git clone https://github.com<your-org-or-username>/COMP7082_Group19_BrainBot.git
+git clone https://github.com/iXelias/COMP7082_Group19_BrainBot.git
 cd COMP7082_Group19_BrainBot
 ```
 
