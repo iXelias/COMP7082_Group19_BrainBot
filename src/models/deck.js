@@ -27,7 +27,7 @@ const deckSchema = new mongoose.Schema(
 );
 
 deckSchema.index(
-    { ownerId: 1, title: 1},
+    { ownerId: 1, title: 1 },
     { unique: true, collation: { locale: 'en', strength: 2 } }
 )
 
