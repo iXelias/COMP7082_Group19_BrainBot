@@ -21,7 +21,7 @@ module.exports =
                 return await interaction.reply(
                     {
                         content: "No decks found! Use `/create-deck` to make your first one.",
-                        ephemeral: true
+                        flags: MessageFlags.Ephemeral
                     });
             }
 
@@ -67,7 +67,7 @@ module.exports =
                     });
             }
 
-            await interaction.reply({ embeds: [embed], ephemeral: true });
+            await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
         }
         catch (error)
         {
@@ -75,7 +75,7 @@ module.exports =
             await interaction.reply(
                 {
                     content: 'There was an error retrieving the decks.',
-                    ephemeral: true
+                    flags: MessageFlags.Ephemeral
                 });
         }
     }

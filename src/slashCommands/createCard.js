@@ -49,7 +49,7 @@ module.exports =
             return await interaction.reply(
             {
                 content: 'Error: The attached file must be an image (PNG, JPG, GIF, or WebP).',
-                ephemeral: true
+                flags: MessageFlags.Ephemeral
             });
         }
 
@@ -62,12 +62,12 @@ module.exports =
             await interaction.reply(
             {
                 content: `Flashcard created successfully!\n**Q:** ${ question }\n**A:** ${ answer }${ imageUrl ? '\n*(Image attached)*' : '' }`,
-                ephemeral: true
+                flags: MessageFlags.Ephemeral
             });
         }
         catch (error)
         {
-            await interaction.reply({ content: `Error: ${ error.message }`, ephemeral: true });
+            await interaction.reply({ content: `Error: ${ error.message }`, flags: MessageFlags.Ephemeral });
         }
     }
 };

@@ -44,7 +44,7 @@ module.exports =
         }
         catch (error)
         {
-            await interaction.reply({ content: `Error: ${ error.message }`, ephemeral: true });
+            await interaction.reply({ content: `Error: ${ error.message }`, flags: MessageFlags.Ephemeral });
         }
     }
 };

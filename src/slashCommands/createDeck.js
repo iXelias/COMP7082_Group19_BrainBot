@@ -29,11 +29,11 @@ module.exports =
         {
             const newDeck = await createDeck({ title, description, topic, ownerId });
 
-            await interaction.reply({ content: `Deck **"${ newDeck.title }"** created successfully!\n**Deck ID:** \`${ newDeck._id }\`\n*(Copy this ID to use with \`/create-card\` and \`/quiz\`)*`, ephemeral: true });
+            await interaction.reply({ content: `Deck **"${ newDeck.title }"** created successfully!\n**Deck ID:** \`${ newDeck._id }\`\n*(Copy this ID to use with \`/create-card\` and \`/quiz\`)*`, flags: MessageFlags.Ephemeral });
         }
         catch (error)
         {
-            await interaction.reply({ content: `Error: ${ error.message }`, ephemeral: true });
+            await interaction.reply({ content: `Error: ${ error.message }`, flags: MessageFlags.Ephemeral });
         }
     }
 };

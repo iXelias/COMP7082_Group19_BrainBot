@@ -34,11 +34,11 @@ module.exports =
         {
             const deletedDeck = await deleteDeck({ deckId, ownerId });
 
-            await interaction.reply({ content: `Deleted deck **"${ deletedDeck.title }"** and all of its flashcards.`, ephemeral: true });
+            await interaction.reply({ content: `Deleted deck **"${ deletedDeck.title }"** and all of its flashcards.`, flags: MessageFlags.Ephemeral });
         }
         catch (error)
         {
-            await interaction.reply({ content: `Error: ${ error.message }`, ephemeral: true });
+            await interaction.reply({ content: `Error: ${ error.message }`, flags: MessageFlags.Ephemeral });
         }
     }
 };

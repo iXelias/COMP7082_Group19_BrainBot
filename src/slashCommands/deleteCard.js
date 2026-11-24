@@ -58,11 +58,11 @@ module.exports =
         {
             const deletedCard = await deleteFlashcard({ cardId, ownerId });
 
-            await interaction.reply({ content: `Deleted flashcard:\n**Q:** ${ deletedCard.question }`, ephemeral: true });
+            await interaction.reply({ content: `Deleted flashcard:\n**Q:** ${ deletedCard.question }`, flags: MessageFlags.Ephemeral });
         }
         catch (error)
         {
-            await interaction.reply({ content: `Error: ${ error.message }`, ephemeral: true });
+            await interaction.reply({ content: `Error: ${ error.message }`, flags: MessageFlags.Ephemeral });
         }
     }
 };

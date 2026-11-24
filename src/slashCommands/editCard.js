@@ -77,7 +77,7 @@ module.exports =
             return await interaction.reply(
             {
                 content: 'You did not provide any changes. Fill in at least one option (`question`, `answer`, `image`, or `remove-image`).',
-                    ephemeral: true
+                    flags: MessageFlags.Ephemeral
             });
         }
 
@@ -86,7 +86,7 @@ module.exports =
             return await interaction.reply(
             {
                 content: 'Error: The attached file must be an image (PNG, JPG, GIF, or WebP).',
-                ephemeral: true
+                flags: MessageFlags.Ephemeral
             });
         }
 
@@ -109,12 +109,12 @@ module.exports =
             await interaction.reply(
             {
                 content: `Flashcard updated successfully!\n**Q:** ${ updated.question }\n**A:** ${ updated.answer }${ updated.imageUrl ? '\n*(Image attached)*' : '' }`,
-                ephemeral: true
+                flags: MessageFlags.Ephemeral
             });
         }
         catch (error)
         {
-            await interaction.reply({ content: `Error: ${ error.message }`, ephemeral: true });
+            await interaction.reply({ content: `Error: ${ error.message }`, flags: MessageFlags.Ephemeral });
         }
     }
 };

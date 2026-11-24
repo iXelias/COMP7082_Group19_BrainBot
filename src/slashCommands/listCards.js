@@ -34,14 +34,14 @@ module.exports =
         const deck = await getDeckById(deckId);
 
         if (!deck)        
-            return await interaction.reply({ content: 'Could not find that deck.', ephemeral: true });        
+            return await interaction.reply({ content: 'Could not find that deck.', flags: MessageFlags.Ephemeral });        
 
         // 3. ADDED: Verify user owns the deck OR it is shared in this server
         const isOwner = deck.ownerId === interaction.user.id;
         const isSharedHere = deck.isShared && deck.guildId === interaction.guildId;
         if (!isOwner && !isSharedHere)
         {
-            return await interaction.reply({ content: 'You do not have access to this private deck.', ephemeral: true });
+            return await interaction.reply({ content: 'You do not have access to this private deck.', flags: MessageFlags.Ephemeral });
         }
 
         const cards = await listFlashcardsByDeck(deckId);
@@ -51,7 +51,7 @@ module.exports =
             return await interaction.reply(
             {
                 content: `The deck **"${ deck.title }"** has no flashcards yet. Use \`/create-card\` to add some!`,
-                ephemeral: true
+                flags: MessageFlags.Ephemeral
             });
         }
 
@@ -69,6 +69,6 @@ module.exports =
             });
         });
 
-        await interaction.reply({ embeds: [embed], ephemeral: true });
+        await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
     }
 };
