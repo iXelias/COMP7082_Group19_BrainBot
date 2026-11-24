@@ -30,6 +30,35 @@ async function listDecksByOwner(ownerId)
     return Deck.find({ ownerId }).sort({ createdAt: -1 });
 }
 
+// ADDED: Fetch user's own decks OR decks shared in this specific Discord server
+async function listAvailableDecks(ownerId, guildId)
+{
+    return Deck.find({ $or: 
+    [
+        { ownerId },
+        { isShared: true, guildId }
+    ]}).sort({ createdAt: -1 });
+}
+
+// ADDED: Allow the creator to share their deck with the current server
+async function shareDeck({ deckId, ownerId, guildId })
+{
+    const deck = await getDeckById(deckId);
+    if (!deck)
+        throw new Error('That deck does not exist.');
+
+    if (deck.ownerId !== ownerId)
+        throw new Error('Only the deck creator can share this deck.');
+
+    if (!guildId)
+        throw new Error('You can only share a deck inside a Discord server.');
+
+    deck.isShared = true;
+    deck.guildId = guildId;
+    await deck.save();
+    return deck;
+}
+
 async function deleteDeck({ deckId, ownerId })
 {
     const deck = await getDeckById(deckId);
@@ -44,4 +73,4 @@ async function deleteDeck({ deckId, ownerId })
     return deck;
 }
 
-module.exports = { createDeck, getDeckById, listDecksByOwner, deleteDeck };
+module.exports = { createDeck, getDeckById, listDecksByOwner, listAvailableDecks, shareDeck, deleteDeck };

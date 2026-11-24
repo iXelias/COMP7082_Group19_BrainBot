@@ -16,7 +16,10 @@ module.exports =
             .setRequired(true))
         .addStringOption(option => option.setName('answer')
             .setDescription('The answer or definition on the back of the card')
-            .setRequired(true)),
+            .setRequired(true))
+        .addAttachmentOption(option => option.setName('image')
+            .setDescription('Optional: Attach an image or diagram to this flashcard')
+            .setRequired(false)),
 
     async autocomplete(interaction)
     {
@@ -37,12 +40,30 @@ module.exports =
         const deckId = interaction.options.getString('deck').trim();
         const question = interaction.options.getString('question');
         const answer = interaction.options.getString('answer');
+        const attachment = interaction.options.getAttachment('image');
         const ownerId = interaction.user.id;
+
+        // Validate that the uploaded file is an image
+        if (attachment && !attachment.contentType?.startsWith('image/'))
+        {
+            return await interaction.reply(
+            {
+                content: 'Error: The attached file must be an image (PNG, JPG, GIF, or WebP).',
+                ephemeral: true
+            });
+        }
+
+        const imageUrl = attachment ? attachment.url : null;
 
         try
         {
-            await addFlashcard({ deckId, ownerId, question, answer });
-            await interaction.reply({ content: `Flashcard created successfully!\n**Q:** ${ question }\n**A:** ${ answer }`, ephemeral: true });
+            await addFlashcard({ deckId, ownerId, question, answer, imageUrl });
+
+            await interaction.reply(
+            {
+                content: `Flashcard created successfully!\n**Q:** ${ question }\n**A:** ${ answer }${ imageUrl ? '\n*(Image attached)*' : '' }`,
+                ephemeral: true
+            });
         }
         catch (error)
         {

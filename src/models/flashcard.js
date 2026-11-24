@@ -22,8 +22,17 @@ const flashcardSchema = new mongoose.Schema(
             minlength: [1, 'The answer cannot be empty.'],
             maxlength: [500, 'The answer exceeds the 500 character limit.'],
         },
+        imageUrl: {
+            type: String,
+            default: null,
+        },
     },
     { timestamps: true }
+);
+
+flashcardSchema.index(
+    { deckId: 1, question: 1 },
+    { unique: true, collation: { locale: 'en', strength: 2 } }
 );
 
 module.exports = mongoose.model('flashcard', flashcardSchema);

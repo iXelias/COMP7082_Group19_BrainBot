@@ -1,84 +1,72 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
-const { getDeckById, listDecksByOwner } = require('../services/deckService');
+// 1. CHANGED: Import listAvailableDecks instead of listDecksByOwner
+const { getDeckById, listAvailableDecks } = require('../services/deckService');
 const { listFlashcardsByDeck } = require('../services/flashcardService');
 
 module.exports =
 {
     data: new SlashCommandBuilder()
         .setName('list-cards')
-        .setDescription('View your saved flashcards')
+        .setDescription('View all flashcards inside a deck')
         .addStringOption(option => option.setName('deck')
-            .setDescription('Optional: Filter cards by a specific deck')
-            .setRequired(false)
+            .setDescription('Select the deck to inspect')
+            .setRequired(true)
             .setAutocomplete(true)),
 
     async autocomplete(interaction)
     {
         const focusedValue = interaction.options.getFocused().toLowerCase();
-        const decks = await listDecksByOwner(interaction.user.id);
+        const decks = await listAvailableDecks(interaction.user.id, interaction.guildId);
 
         const filtered = decks.filter(deck => deck.title.toLowerCase().includes(focusedValue)).slice(0, 25);
 
-        await interaction.respond(filtered.map(deck =>
-        ({
-            name: deck.title,
-            value: deck._id.toString()
-        })));
+        await interaction.respond(
+            filtered.map(deck => ({
+                name: deck.ownerId === interaction.user.id ? deck.title : `${ deck.title } (Shared)`,
+                value: deck._id.toString()
+            }))
+        );
     },
 
     async execute(interaction)
     {
-        const deckId = interaction.options.getString('deck');
-        const ownerId = interaction.user.id;
+        const deckId = interaction.options.getString('deck').trim();
+        const deck = await getDeckById(deckId);
 
-        if (deckId)
+        if (!deck)        
+            return await interaction.reply({ content: 'Could not find that deck.', ephemeral: true });        
+
+        // 3. ADDED: Verify user owns the deck OR it is shared in this server
+        const isOwner = deck.ownerId === interaction.user.id;
+        const isSharedHere = deck.isShared && deck.guildId === interaction.guildId;
+        if (!isOwner && !isSharedHere)
         {
-            const deck = await getDeckById(deckId.trim());
-            if (!deck)            
-                return await interaction.reply({ content: 'Could not find that deck.', ephemeral: true });            
-
-            const cards = await listFlashcardsByDeck(deckId.trim());
-            if (!cards || cards.length === 0)            
-                return await interaction.reply({ content: `The deck **"${ deck.title }"** has no flashcards yet.`, ephemeral: true });            
-
-            const embed = new EmbedBuilder()
-                .setColor(0x0099FF)
-                .setTitle(`Flashcards in "${ deck.title }" (${ cards.length })`)
-                .setFooter({ text: 'Use /delete-card to remove any card.' });
-
-            cards.slice(0, 25).forEach((card, index) =>
-            {
-                embed.addFields({ name: `${ index + 1 }. ${ card.question.substring(0, 200) }`, value: `**A:** ${ card.answer.substring(0, 500) }` });
-            });
-
-            return await interaction.reply({ embeds: [embed], ephemeral: true });
+            return await interaction.reply({ content: 'You do not have access to this private deck.', ephemeral: true });
         }
 
-        const userDecks = await listDecksByOwner(ownerId);
-        if (!userDecks || userDecks.length === 0)        
-            return await interaction.reply({ content: "You don't have any decks or flashcards yet! Use `/create-deck` to get started.", ephemeral: true });        
+        const cards = await listFlashcardsByDeck(deckId);
 
-        const allCards = [];
-        for (const deck of userDecks)
+        if (!cards || cards.length === 0)
         {
-            const cards = await listFlashcardsByDeck(deck._id);
-            cards.forEach(card =>
+            return await interaction.reply(
             {
-                allCards.push({ deckTitle: deck.title, question: card.question, answer: card.answer });
+                content: `The deck **"${ deck.title }"** has no flashcards yet. Use \`/create-card\` to add some!`,
+                ephemeral: true
             });
         }
-
-        if (allCards.length === 0)        
-            return await interaction.reply({ content: "You have decks created, but no flashcards yet! Use `/create-card` to add some.", ephemeral: true });        
 
         const embed = new EmbedBuilder()
             .setColor(0x0099FF)
-            .setTitle(`All Your Flashcards (${ allCards.length })`)
-            .setFooter({ text: 'Tip: Select a deck in /list-cards to filter by subject.' });
+            .setTitle(`Flashcards in "${ deck.title }" (${ cards.length })`)
+            .setFooter({ text: isOwner ? 'Use /delete-card to remove any card.' : 'Shared server deck (read-only)' });
 
-        allCards.slice(0, 25).forEach((item, index) =>
+        cards.slice(0, 25).forEach((card, index) =>
         {
-            embed.addFields({ name: `${ index + 1 }. [${ item.deckTitle }] ${ item.question.substring(0, 180) }`,  value: `**A:** ${ item.answer.substring(0, 500) }` });
+            embed.addFields(
+            {
+                name: `${ index + 1 }. ${ card.question.substring(0, 200) }`,
+                value: `**A:** ${ card.answer.substring(0, 500) }`
+            });
         });
 
         await interaction.reply({ embeds: [embed], ephemeral: true });
